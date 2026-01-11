@@ -102,8 +102,12 @@ vim.g.have_nerd_font = false
 vim.o.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.o.relativenumber = true
+vim.o.relativenumber = true
 
+-- toggle command
+vim.api.nvim_create_user_command('ToggleRnu', function()
+  vim.o.relativenumber = not vim.o.relativenumber
+end, {})
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.o.mouse = 'a'
 
@@ -151,7 +155,13 @@ vim.o.splitbelow = true
 --   and `:help lua-options-guide`
 vim.o.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+vim.opt_local.expandtab = true
 
+vim.opt_local.softtabstop = 4
+
+vim.opt_local.shiftwidth = 4
+
+vim.opt_local.formatoptions:append { c = true, r = true, o = true, q = true }
 -- Preview substitutions live, as you type!
 vim.o.inccommand = 'split'
 
@@ -474,6 +484,9 @@ require('lazy').setup({
         { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
       },
     },
+  },
+  {
+    'tpope/vim-surround',
   },
   {
     -- Main LSP Configuration
@@ -940,22 +953,35 @@ require('lazy').setup({
   },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
+    branch = 'master',
+    lazy = false, -- Make sure to load this during startup
     build = ':TSUpdate',
-    main = 'nvim-treesitter.configs', -- Sets main module to use for opts
-    -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-    opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
-      -- Autoinstall languages that are not installed
-      auto_install = true,
-      highlight = {
-        enable = true,
-        -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-        --  If you are experiencing weird indenting issues, add the language to
-        --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-        additional_vim_regex_highlighting = { 'ruby' },
-      },
-      indent = { enable = true, disable = { 'ruby' } },
-    },
+    config = function()
+      require('nvim-treesitter.configs').setup {
+        ensure_installed = {
+          'bash',
+          'c',
+          'diff',
+          'html',
+          'lua',
+          'luadoc',
+          'markdown',
+          'markdown_inline',
+          'query',
+          'vim',
+          'vimdoc',
+        },
+        auto_install = true,
+        highlight = {
+          enable = true,
+          additional_vim_regex_highlighting = { 'ruby' },
+        },
+        indent = {
+          enable = true,
+          disable = { 'ruby' },
+        },
+      }
+    end,
     -- There are additional nvim-treesitter modules that you can use to interact
     -- with nvim-treesitter. You should go explore a few and see what interests you:
     --
