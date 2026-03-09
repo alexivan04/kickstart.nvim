@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
@@ -145,6 +145,12 @@ vim.o.timeoutlen = 300
 vim.o.splitright = true
 vim.o.splitbelow = true
 
+vim.o.expandtab = true
+vim.o.smartindent = true
+vim.o.softtabstop = 4
+vim.o.tabstop = 4
+vim.o.shiftwidth = 4
+
 -- Sets how neovim will display certain whitespace characters in the editor.
 --  See `:help 'list'`
 --  and `:help 'listchars'`
@@ -155,11 +161,6 @@ vim.o.splitbelow = true
 --   and `:help lua-options-guide`
 vim.o.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
-vim.opt_local.expandtab = true
-
-vim.opt_local.softtabstop = 4
-
-vim.opt_local.shiftwidth = 4
 
 vim.opt_local.formatoptions:append { c = true, r = true, o = true, q = true }
 -- Preview substitutions live, as you type!
@@ -684,7 +685,29 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        -- clangd = {},
+        clangd = {
+          cmd = {
+            'clangd',
+            '--background-index',
+            '--clang-tidy',
+            '--completion-style=detailed',
+            '--header-insertion=never',
+          },
+        },
+
+        rust_analyzer = {
+          settings = {
+            ['rust-analyzer'] = {
+              cargo = {
+                allFeatures = true,
+              },
+              checkOnSave = {
+                command = 'clippy',
+              },
+            },
+          },
+        },
+
         -- gopls = {},
         -- pyright = {},
         -- rust_analyzer = {},
@@ -747,6 +770,10 @@ require('lazy').setup({
         },
       }
     end,
+  },
+  {
+    'sbatin/platformio.nvim',
+    dependencies = { 'numToStr/FTerm.nvim' },
   },
 
   { -- Autoformat
@@ -970,6 +997,7 @@ require('lazy').setup({
           'query',
           'vim',
           'vimdoc',
+          'rust',
         },
         auto_install = true,
         highlight = {
